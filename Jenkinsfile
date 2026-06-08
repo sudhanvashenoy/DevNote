@@ -28,8 +28,17 @@ pipeline {
                 echo '🚀 Deploying to Production EC2...'
                 sshagent(['prod-ssh-key']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no \
-                        ${PROD_USER}@${PROD_HOST} "
+                        # Save image as tar file
+                        docker save static-app:latest | gzip > static-app.tar.gz
+
+                        # Copy image to Production EC2
+                        scp -o StrictHostKeyChecking=no \
+                            static-app.tar.gz \
+                            ubuntu@${PROD_HOST}:/home/ubuntu/
+
+                        # SSH into Production and load + run image
+                        ssh -o StrictHostKeyChecking=no ubuntu@${PROD_HOST} "
+                            docker load < /home/ubuntu/static-app.tar.gz &&
                             docker stop static-app || true &&
                             docker rm static-app || true &&
                             docker run -d \
