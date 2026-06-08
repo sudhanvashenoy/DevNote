@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PROD_USER = 'ubuntu'
-        PROD_HOST = '13.203.217.222'
+        PROD_HOST = '65.0.170.146'
         IMAGE_NAME = 'static-app'
     }
 
